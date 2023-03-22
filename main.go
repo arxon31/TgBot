@@ -1,20 +1,35 @@
 package main
 
 import (
-	"TgBot/clients/telegram"
+	tgClient "TgBot/clients/telegram"
+	event_consumer "TgBot/consumer/event-consumer"
+	telegram "TgBot/events/telegram"
+	"TgBot/storage/files"
 	"flag"
 	"log"
 )
 
+const (
+	host        = "api.telegram.org"
+	storagePath = "storage"
+	batchSize   = 100
+)
+
 func main() {
 
-	tgClient := telegram.New(mustHost(), mustToken())
+	eventsProcessor := telegram.New(
+		tgClient.New(host, mustToken()),
+		files.New(storagePath),
+	)
 
-	// fetcher = fetcher.New(tgClient)
+	log.Print("service started")
 
-	// processor = processor.New(tgClient)
+	consumer := event_consumer.New(eventsProcessor, eventsProcessor, batchSize)
 
-	// consumer.start(fetcher, processor)
+	if err := consumer.Start(); err != nil {
+		log.Fatal()
+	}
+
 }
 
 func mustToken() string {
@@ -31,6 +46,7 @@ func mustToken() string {
 	return *token
 }
 
+/*
 func mustHost() string {
 	host := flag.String(
 		"host",
@@ -44,3 +60,4 @@ func mustHost() string {
 	}
 	return *host
 }
+*/

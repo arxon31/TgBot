@@ -63,15 +63,15 @@ func (s Storage) PickRandom(userName string) (page *storage.Page, err error) {
 		return nil, err
 	}
 	if len(files) == 0 {
-		return nil, errors.New("no saved pages in this directory")
+		return nil, storage.ErrNoSavedPages
 	}
+
 	rand.Seed(time.Now().UnixNano())
 	n := rand.Intn(len(files))
 
 	file := files[n]
 
 	return s.decodePage(filepath.Join(filePath, file.Name()))
-
 }
 
 func (s Storage) Remove(p *storage.Page) error {
