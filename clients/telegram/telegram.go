@@ -33,7 +33,7 @@ func newBasePath(token string) string {
 	return "bot" + token
 }
 
-func (c *Client) Update(offset, limit int) (updates []Update, err error) {
+func (c *Client) Updates(offset, limit int) (updates []Update, err error) {
 	defer func() {
 		err = e.Wrap("can't get updates", err)
 	}()
@@ -52,15 +52,18 @@ func (c *Client) Update(offset, limit int) (updates []Update, err error) {
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err
 	}
+
 	return res.Result, nil
 }
 
 func (c *Client) SendMessage(chatID int, text string) error {
+
 	q := url.Values{}
-	q.Add("chatID", strconv.Itoa(chatID))
+	q.Add("chat_id", strconv.Itoa(chatID))
 	q.Add("text", text)
 
 	_, err := c.doRequest(sendMessageMethod, q)
+
 	if err != nil {
 		return e.Wrap("can't send message", err)
 	}
